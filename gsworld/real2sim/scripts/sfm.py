@@ -99,18 +99,20 @@ def main():
         if os.path.exists(database_path):
             logging.info("Removing existing database.db")
             os.remove(database_path)
+        # COLMAP >=4 renamed GPU flags from SiftExtraction/SiftMatching to
+        # FeatureExtraction/FeatureMatching.
         run_cmd(f"{colmap_command} feature_extractor " \
             f"--database_path {database_path} " \
             f"--image_path {images_path} " \
             f"--ImageReader.single_camera 1 " \
             f"--ImageReader.camera_model {camera} " \
-            f"--SiftExtraction.use_gpu {use_gpu}", "Feature extraction")
+            f"--FeatureExtraction.use_gpu {use_gpu}", "Feature extraction")
         
         ## Feature matching
         logging.info("Starting feature matching...")
         run_cmd(f"{colmap_command} exhaustive_matcher " \
             f"--database_path {database_path} " \
-            f"--SiftMatching.use_gpu {use_gpu} " , "Feature matching")
+            f"--FeatureMatching.use_gpu {use_gpu} " , "Feature matching")
         
         ### Bundle adjustment
         logging.info("Starting bundle adjustment...")
@@ -123,8 +125,9 @@ def main():
             f"--Mapper.ba_global_function_tolerance=0.000001", "Bundle adjustment")
         
         ### Convert the model to a text file
+        # 3DGS expects COLMAP model under sparse/0/{cameras,images,points3D}.txt
         logging.info("Converting model to text format...")
-        sparse_output_path = os.path.join(source_path, "sparse")
+        sparse_output_path = os.path.join(source_path, "sparse", "0")
         os.makedirs(sparse_output_path, exist_ok=True)
         
         sparse_input_path = os.path.join(sparse_distorted_path, "0")
@@ -144,9 +147,11 @@ def main():
         else:
             logging.info("Keeping distorted folder as requested.")
             
-        # TODO delete some files in the sparse folder
-        os.system(f"rm -r {sparse_output_path}/frames.txt")
-        os.system(f"rm -r {sparse_output_path}/rigs.txt")
+        # COLMAP 4 may write rig/frame metadata that 3DGS does not need
+        for extra in ("frames.txt", "rigs.txt"):
+            extra_path = os.path.join(sparse_output_path, extra)
+            if os.path.exists(extra_path):
+                os.remove(extra_path)
     
     logging.info("COLMAP processing completed successfully!")
 

@@ -3,13 +3,31 @@
 **exp_logs/
 **demos/
 
+# Downloaded assets (HuggingFace assets.zip), keep robots/ and scene glb tracked
+*.zip
+gsworld/mani_skill/assets/dtc_assets/
+gsworld/mani_skill/assets/objs/
+gsworld/mani_skill/assets/scene/
+
 # Python bytecode
 __pycache__/
 *.py[cod]
 *$py.class
 
+# Compiled extensions / C++ / CUDA build artifacts
+*.so
+*.o
+*.obj
+*.a
+*.dll
+*.dylib
+*.pyd
+*.egg
+.eggs/
+
 # Virtual environment
 venv/
+.venv/
 .env/
 
 # Jupyter Notebook checkpoints
@@ -29,6 +47,10 @@ Thumbs.db
 *.err
 .cache/
 *.tmp
+wandb/
+runs/
+tensorboard/
+events.out.tfevents.*
 
 # Build and distribution
 build/
@@ -43,3 +65,26 @@ dist/
 # Data or large files (optional)
 data/
 outputs/
+output/
+
+# Model checkpoints
+checkpoints/
+ckpts/
+*.ckpt
+*.pth
+*.pt
+*.safetensors
+
+# Recorded trajectories / videos / experiment results
+*.h5
+*.hdf5
+*.mp4
+*.avi
+*.mov
+videos/
+results/
+
+# COLMAP intermediate files
+database.db
+*.db-shm
+*.db-wal
